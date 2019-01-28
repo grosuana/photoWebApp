@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/grosuana/photoWebApp/issues"
   },
-  "homepage": "https://github.com/grosuana/photoWebApp#readme"
+  "homepage": "https://github.com/grosuana/photoWebApp#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "mysql": "^2.16.0"
+  }
 }
