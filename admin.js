@@ -4,15 +4,15 @@ function modifyRow() {
     let modifyRow = document.getElementById("rowModify");
     let tableName = globalTable.name;
     let rowNum = modifyRow.value - 1;
-    let query = "UPDATE `mobilaComanda`.`" + tableName + "` SET ";
+    let query = "UPDATE `photoWebApp`.`" + tableName + "` SET ";
     globalTable.columns.forEach(function(column, index) {
         let inputValue = document.getElementById("input" + index);
         query = query + "`" + column.toString() + "` = '" + inputValue.value.toString() + "', ";
     })
     query = query.slice(0, -2);
     query = query + " WHERE `" + tableName + "`.`" + globalTable.columns[0].toString() + "` = " + globalTable.data[rowNum][0] + ";";
-    //UPDATE `mobilaComanda`.`salarii` SET `codSalariu` = '5000', `valoare` = '1501' WHERE `salarii`.`codSalariu` = 600;
-    //UPDATE `mobilaComanda`.`masini` SET `codMasina` = '1000', `ocupata` = 'DA' WHERE `masini`.`codMasina` = 1001
+    //UPDATE `photoWebApp`.`salarii` SET `codSalariu` = '5000', `valoare` = '1501' WHERE `salarii`.`codSalariu` = 600;
+    //UPDATE `photoWebApp`.`masini` SET `codMasina` = '1000', `ocupata` = 'DA' WHERE `masini`.`codMasina` = 1001
     //console.log(query);
     axios.get('/query?name=' + tableName + '&query=' + query)
         .then(function(response) {
@@ -25,8 +25,8 @@ function deleteRow() {
     let deleteRow = document.getElementById("rowDelete");
     let tableName = globalTable.name;
     let rowNum = deleteRow.value - 1;
-    let query = "DELETE FROM `mobilaComanda`.`" + tableName + "` WHERE `" + tableName + "`.`" + globalTable.columns[0] + "` = " + globalTable.data[rowNum][0];
-    // "DELETE FROM `mobilaComanda`.`salarii` WHERE `salarii`.`codSalariu` = 900"
+    let query = "DELETE FROM `photoWebApp`.`" + tableName + "` WHERE `" + tableName + "`.`" + globalTable.columns[0] + "` = " + globalTable.data[rowNum][0];
+    // "DELETE FROM `photoWebApp`.`salarii` WHERE `salarii`.`codSalariu` = 900"
     //console.log(query);
     axios.get('/query?name=' + tableName + '&query=' + query)
         .then(function(response) {
@@ -47,7 +47,7 @@ function myFunction() {
 }
 
 function addRow() {
-    //INSERT INTO `mobilaComanda`.`salarii` (`codSalariu`, `valoare`) VALUES ('900', '034567');
+    //INSERT INTO `photoWebApp`.`salarii` (`codSalariu`, `valoare`) VALUES ('900', '034567');
     let tableName = globalTable.name;
     let columnNames = "";
     globalTable.columns.forEach(function(column) {
@@ -63,7 +63,7 @@ function addRow() {
     }
     values = values.slice(0, -2);
 
-    let query = "INSERT INTO `mobilaComanda`.`" + tableName + "` (" + columnNames + values + ");";
+    let query = "INSERT INTO `photoWebApp`.`" + tableName + "` (" + columnNames + values + ");";
     // console.log(query);
     //console.log(globalTable);
 
@@ -78,7 +78,7 @@ function getTables() {
     let dropdown = document.getElementById("dropdown");
     axios.get('/databaseNames')
         .then(function(response) {
-            //console.log(response)
+            console.log(response)
             response.data.forEach(function(tableName) {
                 let option = document.createElement("option");
                 option.text = tableName.toString();

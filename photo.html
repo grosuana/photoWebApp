@@ -139,38 +139,40 @@
         appearance: none;
         padding: 5px;
     }
-
-    
     </style>
-    <title>Administrator window</title>
+    <title>Add photo</title>
 </head>
 
 <body>
     <script src="/axios.min.js"></script>
     <ul>
-        <li><a class="active" href="/admin.html">Modify Database</a></li>
-        <!-- <li><a  href="/photo.html">Add photo</a></li> -->
-       <!--  <li><a  href="/product.html">Product catalog</a></li>
-        <li><a  href="/order.html">Order status</a></li> -->
-
+        <!--  <li><a href="/admin.html">Modify Database</a></li> -->
+        <li><a class="active" href="/photo.html">Add photo</a></li>
+        <li><a href="/photo.html">Wall</a></li>
+        <!-- <li><a  href="/order.html">Order status</a></li> -->
     </ul>
     <br>
-    <select id="dropdown">Select table</select>
-    <br>
-    <div class="container" style="background-color:#f1f1f1">
-        <h1 style="color:#4CAF50;" id="nume"></h1>
-        <table id="t01"></table>
-        <br>
-        <table id="toAdd"></table>
-        <button id="butonas" type="submit">Add row</button>
-       
-         <button style="background-color: orange" id="modify" type="submit" class="cancelbtn">Modify row number </button> <select id="rowModify"> Modify row </select> 
-          <br>
-       <button id="cancelBut" type="button" class="cancelbtn">Delete row number </button> <select id="rowDelete"> Delete row </select> 
-       
-       
-    </div>
-    <script src="/admin.js" type="text/javascript"></script>
+    <form id="myform" method="post" action="/upload" enctype="multipart/form-data">
+        <div>
+
+        <!-- 	<label for="uname"><b>Username</b></label>
+   			 <input type="text" placeholder="Enter Username" name="uname" required> -->
+
+            <label for="image_uploads">Choose image to upload (PNG)</label>
+            <input type="file" id="image_uploads" name="image_uploads" accept=".png" required>
+
+        </div>
+        <div class="preview">
+            <p>No files currently selected for upload</p>
+        </div>
+        <label for="image_text"></label>
+        <input type="text" id="image_text" name="image_text" required placeholder="Image title">
+        <div>
+        	<input type="hidden" id="userId" name="userId">
+            <button type="button" id="submitButton">Submit</button>
+        </div>
+    </form>
+    <script src="/photo.js" type="text/javascript"></script>
 </body>
 
 </html>
