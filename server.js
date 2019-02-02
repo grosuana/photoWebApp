@@ -121,17 +121,19 @@ app.get('/customquery', function(req, res) {
 
     database.query(query, (error, results, fields) => {
         let resultTable = {};
-        resultTable.data = [];
-        resultArray = results;
-        let obj = JSON.stringify(resultArray[0]);
-        let obj1 = JSON.parse(obj);
-        resultTable.columns = Object.keys(obj1)
-        resultTable.name = query;
-        resultTable.rows = resultArray.length;
+       
+            resultTable.data = [];
+            resultArray = results;
+            let obj = JSON.stringify(resultArray[0]);
+            let obj1 = JSON.parse(obj);
+            resultTable.columns = Object.keys(obj1)
+            resultTable.name = query;
+            resultTable.rows = resultArray.length;
 
-        resultArray.forEach(function(rowObj) {
-            resultTable.data.push(Object.values(rowObj))
-        })
+            resultArray.forEach(function(rowObj) {
+                resultTable.data.push(Object.values(rowObj))
+            })
+        
         if (error) {
             console.log(error);
             res.send(error);
@@ -202,6 +204,11 @@ app.post("/upload", upload.single("image_uploads"), (req, res) => {
                 .end("Only .png files are allowed!");
         });
     }
+});
+
+app.get("/image", (req, res) => {
+    //res.sendFile(path.join(__dirname, "./uploads/photo.png"));
+    res.sendFile(req.query.path);
 });
 
 app.listen(9000);
