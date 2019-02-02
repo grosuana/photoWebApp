@@ -1,6 +1,14 @@
 
 function deleteThisOne(event){
 	let photoId = event.target.className;
+	let query = "DELETE FROM `photoWebApp`.`poze` WHERE `poze`.`pozaid` = '"+ photoId +"'";
+	console.log(query);
+	axios.get('/query?name=poze&query=' + query)
+            .then(function(response) {
+            	console.log(response);
+                loadFeed();
+            })
+	
 }
 
 
@@ -83,6 +91,8 @@ async function getLikes(photoId) { //counts likes per photo
         });
     return totalLikes;
 }
+
+
 
 async function getUserName(userId) {
     let username = "ana";
@@ -204,7 +214,7 @@ async function createImgBox(path, user, date, titleText, idPoza, likes) {
         });
 
     let deleteBtn = document.createElement("button");
-    deleteBtn.classList.add("cancelbtn");
+    
     deleteBtn.onclick = deleteThisOne;
     deleteBtn.classList.add(idPoza);
     deleteBtn.innerHTML = 'Delete!';
@@ -220,10 +230,13 @@ async function createImgBox(path, user, date, titleText, idPoza, likes) {
 
 async function loadFeed() {
     let tableName = "poze";
-    let query = "SELECT * FROM `poze` ORDER BY `data` DESC";
+    let userId = window.localStorage.getItem('id');
+    let query = 'SELECT DISTINCT `poze`.* FROM `poze` LEFT JOIN `photoWebApp`.`likeuri` ON `poze`.`pozaid` = `likeuri`.`pozaid` WHERE `poze`.`userid` = "' + userId + '" ORDER BY (SELECT COUNT(*) FROM `photoWebApp`.`likeuri` b where b.pozaid = `poze`.`pozaid`) DESC';
+   console.log(query)
     document.getElementById("username").innerHTML = `Welcome back, ${await getUserName(window.localStorage.getItem('id'))} !`;
     axios.get('/customquery?name=' + tableName + '&query=' + query) //selectam toate caile pozelor de afisat
         .then(function(response) {
+        	console.log(response)
             let div = document.getElementById("photos");
             div.innerHTML = "";
             response.data.data.forEach(async function(row, index) {
