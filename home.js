@@ -1,3 +1,9 @@
+
+function deleteThisOne(event){
+	let photoId = event.target.className;
+}
+
+
 async function likeButtonPressed(event) {
     let photoId = event.target.className;
     let userId = window.localStorage.getItem('id');
@@ -54,7 +60,7 @@ function commentButtonPressed(event) {
             let query = "INSERT INTO `photoWebApp`.`comentarii` (`comid`, `userid`, `pozaid`, `text`) VALUES ('" + uid + "', '" + userId + "', '" + photoId + "', '" + comment + "');";
             axios.get('/query?name=likeuri&query=' + query)
                 .then(function(response) {
-                	loadFeed();
+                    loadFeed();
                 })
         })
 }
@@ -100,7 +106,7 @@ async function createImgBox(path, user, date, titleText, idPoza, likes) {
     div.style.width = "50%"
 
     let intro = document.createElement("h2");
-    intro.innerHTML = `Added by ${user} on ${date}`;
+    intro.innerHTML = `Added by you on ${date}`;
     div.appendChild(intro);
 
     let img = document.createElement("img");
@@ -197,6 +203,14 @@ async function createImgBox(path, user, date, titleText, idPoza, likes) {
             console.error(error);
         });
 
+    let deleteBtn = document.createElement("button");
+    deleteBtn.classList.add("cancelbtn");
+    deleteBtn.onclick = deleteThisOne;
+    deleteBtn.classList.add(idPoza);
+    deleteBtn.innerHTML = 'Delete!';
+    deleteBtn.id = "buttonashulMeu";
+    div.appendChild(deleteBtn);
+
     div.appendChild(document.createElement("br"));
     div.appendChild(document.createElement("br"));
     div.appendChild(document.createElement("hr"));
@@ -204,10 +218,10 @@ async function createImgBox(path, user, date, titleText, idPoza, likes) {
 }
 
 
-function loadFeed() {
+async function loadFeed() {
     let tableName = "poze";
     let query = "SELECT * FROM `poze` ORDER BY `data` DESC";
-
+    document.getElementById("username").innerHTML = `Welcome back, ${await getUserName(window.localStorage.getItem('id'))} !`;
     axios.get('/customquery?name=' + tableName + '&query=' + query) //selectam toate caile pozelor de afisat
         .then(function(response) {
             let div = document.getElementById("photos");

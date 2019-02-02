@@ -40,6 +40,10 @@ app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname + '/index.html'));
 });
 
+app.get('/uid', function(req, res) {
+	res.send(shortid.generate().toString());
+});
+
 app.post('/login', function(req, res) {
     let amTrimis = false;
 
