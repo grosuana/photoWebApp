@@ -1,6 +1,7 @@
 #local 
 uploads/
 images/
+secret.js
 
 # Logs
 logs

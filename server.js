@@ -8,6 +8,8 @@ const multer = require("multer");
 const fs = require("fs");
 const uniqueFilename = require('unique-filename');
 const shortid = require("shortid");
+const dropbox = require("./dropbox");
+const secret = require("./secret");
 
 const upload = multer({
     dest: __dirname + '/images'
@@ -28,10 +30,10 @@ app.use(bodyParser.urlencoded({
 
 //initiem conexiunea la baza de date
 let database = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '12345',
-    database: 'photoWebApp'
+    host: secret.host,
+    user: secret.user,
+    password: secret.password,
+    database: secret.database
 });
 //console.log(database.connect());
 
@@ -121,18 +123,23 @@ app.get('/customquery', function(req, res) {
 
     let tableName = req.query.name;
     let query = req.query.query;
-    console.log(query);
 
     database.query(query, (error, results, fields) => {
         let resultTable = {};
-       
-            resultTable.data = [];
-            resultArray = results;
-            let obj = JSON.stringify(resultArray[0]);
-            let obj1 = JSON.parse(obj);
-            resultTable.columns = Object.keys(obj1)
-            resultTable.name = query;
-            resultTable.rows = resultArray.length;
+       	let resultArray;
+       		try {
+	            resultTable.data = [];
+	            resultArray = results;
+	            if(resultArray[0]){
+		            let obj = JSON.stringify(resultArray[0]);
+		            let obj1 = JSON.parse(obj);
+		            resultTable.columns = Object.keys(obj1)
+		            resultTable.name = query;
+		            resultTable.rows = resultArray.length;
+	            }
+       		} catch(err){
+       			console.log(err);
+       		}
 
             resultArray.forEach(function(rowObj) {
                 resultTable.data.push(Object.values(rowObj))
@@ -181,23 +188,34 @@ app.get('/table', function(req, res) {
 })
 
 
-app.post("/upload", upload.single("image_uploads"), (req, res) => {
+app.post("/upload", upload.single("image_uploads"), async(req, res) => {
     //console.log(req.body);
     const tempPath = req.file.path;
-    const targetPath = uniqueFilename(path.join(__dirname, "./uploads"), "image").toString() + ".png";
+    const fileName = uniqueFilename("").toString() + ".png";
+
+    const targetPath = path.join(__dirname, "uploads", fileName).toString();
     //const targetPath = path.join(__dirname, "./uploads/image.png");
 
     if (path.extname(req.file.originalname).toLowerCase() === ".png") {
         //console.log(targetPath)
-        fs.rename(tempPath, targetPath, err => {
+        fs.rename(tempPath, targetPath, async err => {
             if (err) { console.log(err) }
-            let query = "INSERT INTO `photoWebApp`.`poze` (`pozaid`, `userid`, `data`, `calepoza`, `titlu`) VALUES ('" + shortid.generate().toString() + "', '" + req.body.userId.toString() + "', CURRENT_TIMESTAMP, '" + targetPath + "', '" + req.body.image_text.toString() + "');"
+            let query = "INSERT INTO `photoWebApp`.`poze` (`pozaid`, `userid`, `data`, `calepoza`, `titlu`) VALUES ('" + shortid.generate().toString() + "', '" + req.body.userId.toString() + "', CURRENT_TIMESTAMP, '" + fileName + "', '" + req.body.image_text.toString() + "');"
             console.log(query);
             database.query(query, (error, results, fields) => {
                 if (error) { console.log(error); }
                 res.sendFile(path.join(__dirname + '/photo.html'));
             })
         });
+
+        //for dropbox
+        try{
+    		await dropbox.uploadFile( '/' + fileName, targetPath, req.body.image_text.toString())
+    	}catch(err){
+    		console.log(err);
+    	}
+    	fs.unlink(targetPath, console.log);
+
     } else {
         fs.unlink(tempPath, err => {
             if (err) return handleError(err, res);
@@ -210,9 +228,11 @@ app.post("/upload", upload.single("image_uploads"), (req, res) => {
     }
 });
 
-app.get("/image", (req, res) => {
+app.get("/image", async(req, res) => {
+	console.log("path:" + req.query.path);
+	await dropbox.downloadFile('uploads', "/" + req.query.path, req.query.path);
     //res.sendFile(path.join(__dirname, "./uploads/photo.png"));
-    res.sendFile(req.query.path);
+    res.sendFile(path.join(__dirname, "uploads", req.query.path));
 });
 
 app.listen(9000);

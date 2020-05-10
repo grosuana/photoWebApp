@@ -32,7 +32,8 @@ async function isLiked(idPoza) {
     let query = 'SELECT COUNT(*) FROM `likeuri` WHERE `pozaid` = "1000" OR (`userid` = "' + userId + '"AND `pozaid` = "' + idPoza + '")';
     await axios.get('/customquery?name=likeuri&query=' + query)
         .then(function(response) {
-            liked = response.data.data[0][0] - 1;
+            liked = response.data.data[0][0];
+            console.log(liked);
         })
         .catch(function(error) {
             console.error(error);
@@ -70,7 +71,7 @@ async function getLikes(photoId) { //counts likes per photo
     let query = 'SELECT COUNT(*) FROM `likeuri` WHERE `pozaid` = "' + photoId + '" OR `pozaid` = "1000"';
     await axios.get('/customquery?name=likeuri&query=' + query)
         .then(function(response) {
-            totalLikes = response.data.data[0][0];
+            totalLikes = (Number(response.data.data[0][0])).toString();
         })
         .catch(function(error) {
             console.error(error);

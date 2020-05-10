@@ -19,6 +19,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
+    "dropbox-v2-api": "^2.4.17",
     "express": "^4.16.4",
     "fs": "0.0.1-security",
     "multer": "^1.4.1",

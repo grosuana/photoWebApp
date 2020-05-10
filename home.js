@@ -1,17 +1,21 @@
+function deleteThisOne(event) {
+    let photoId = event.target.className;
+    let query = "DELETE FROM `photoWebApp`.`poze` WHERE `poze`.`pozaid` = '" + photoId + "'";
+    console.log(query);
+    axios.get('/query?name=poze&query=' + query)
+        .then(function(response) {
+            console.log(response);
+            loadFeed();
+        })
 
-function deleteThisOne(event){
-	let photoId = event.target.className;
-	let query = "DELETE FROM `photoWebApp`.`poze` WHERE `poze`.`pozaid` = '"+ photoId +"'";
-	console.log(query);
-	axios.get('/query?name=poze&query=' + query)
-            .then(function(response) {
-            	console.log(response);
-                loadFeed();
-            })
-	
 }
 
+function exit() {
 
+    location.href = "/";
+    window.localStorage.clear();
+
+}
 async function likeButtonPressed(event) {
     let photoId = event.target.className;
     let userId = window.localStorage.getItem('id');
@@ -46,7 +50,7 @@ async function isLiked(idPoza) {
     let query = 'SELECT COUNT(*) FROM `likeuri` WHERE `pozaid` = "1000" OR (`userid` = "' + userId + '"AND `pozaid` = "' + idPoza + '")';
     await axios.get('/customquery?name=likeuri&query=' + query)
         .then(function(response) {
-            liked = response.data.data[0][0] - 1;
+            liked = response.data.data[0][0];
         })
         .catch(function(error) {
             console.error(error);
@@ -84,7 +88,7 @@ async function getLikes(photoId) { //counts likes per photo
     let query = 'SELECT COUNT(*) FROM `likeuri` WHERE `pozaid` = "' + photoId + '" OR `pozaid` = "1000"';
     await axios.get('/customquery?name=likeuri&query=' + query)
         .then(function(response) {
-            totalLikes = response.data.data[0][0];
+            totalLikes = (Number(response.data.data[0][0])).toString();;
         })
         .catch(function(error) {
             console.error(error);
@@ -95,7 +99,7 @@ async function getLikes(photoId) { //counts likes per photo
 
 
 async function getUserName(userId) {
-    let username = "ana";
+    let username = "Placeholder";
     let query = 'SELECT `uname` FROM `users` WHERE `userid` = "' + userId + '"'
     await axios.get('/customquery?name=users&query=' + query)
         .then(function(response) {
@@ -214,7 +218,7 @@ async function createImgBox(path, user, date, titleText, idPoza, likes) {
         });
 
     let deleteBtn = document.createElement("button");
-    
+
     deleteBtn.onclick = deleteThisOne;
     deleteBtn.classList.add(idPoza);
     deleteBtn.innerHTML = 'Delete!';
@@ -231,12 +235,12 @@ async function createImgBox(path, user, date, titleText, idPoza, likes) {
 async function loadFeed() {
     let tableName = "poze";
     let userId = window.localStorage.getItem('id');
-    let query = 'SELECT DISTINCT `poze`.* FROM `poze` LEFT JOIN `photoWebApp`.`likeuri` ON `poze`.`pozaid` = `likeuri`.`pozaid` WHERE `poze`.`userid` = "' + userId + '" ORDER BY (SELECT COUNT(*) FROM `photoWebApp`.`likeuri` b where b.pozaid = `poze`.`pozaid`) DESC';
-   console.log(query)
+    let query = 'SELECT DISTINCT `poze`.* FROM `poze` LEFT JOIN `photoWebApp`.`likeuri` ON `poze`.`pozaid` = `likeuri`.`pozaid` WHERE `poze`.`pozaid` = "1000" OR `poze`.`userid` ="' + userId + '" ORDER BY (SELECT COUNT(*) FROM `photoWebApp`.`likeuri` b where b.pozaid = `poze`.`pozaid`) DESC, data DESC';
+    console.log(query)
     document.getElementById("username").innerHTML = `Welcome back, ${await getUserName(window.localStorage.getItem('id'))} !`;
     axios.get('/customquery?name=' + tableName + '&query=' + query) //selectam toate caile pozelor de afisat
         .then(function(response) {
-        	console.log(response)
+            console.log(response)
             let div = document.getElementById("photos");
             div.innerHTML = "";
             response.data.data.forEach(async function(row, index) {
@@ -258,3 +262,7 @@ async function loadFeed() {
 }
 
 loadFeed();
+let logout = document.getElementById("logout");
+logout.innerHTML = "🚪";
+logout.onclick = exit;
+//logout.style.fontSize = "100%";
